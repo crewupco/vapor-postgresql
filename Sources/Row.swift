@@ -23,8 +23,8 @@
 import Foundation
 
 public enum RowError: Error {
-  case ExpectedField(DeclaredField)
-  case UnexpectedNilValue(DeclaredField)
+  case expectedField(DeclaredField)
+  case unexpectedNilValue(DeclaredField)
 }
 
 public struct RowIterator {
@@ -83,7 +83,7 @@ public struct Row: CustomStringConvertible {
     }
         
     guard let result = data else {
-      throw RowError.ExpectedField(field)
+      throw RowError.expectedField(field)
     }
     
     return result
@@ -91,7 +91,7 @@ public struct Row: CustomStringConvertible {
     
   public func data(_ field: DeclaredField) throws -> Data {
     guard let data: Data = try data(field) else {
-      throw RowError.UnexpectedNilValue(field)
+      throw RowError.unexpectedNilValue(field)
     }
         
     return data
@@ -101,7 +101,7 @@ public struct Row: CustomStringConvertible {
     let field = DeclaredField(name: field)
     
     guard let data: Data = try data(field) else {
-      throw RowError.UnexpectedNilValue(field)
+      throw RowError.unexpectedNilValue(field)
     }
         
     return data
@@ -119,7 +119,7 @@ public struct Row: CustomStringConvertible {
     
   public func value<T: SQLDataConvertible>(_ field: DeclaredField) throws -> T {
     guard let data: Data = try data(field) else {
-      throw RowError.UnexpectedNilValue(field)
+      throw RowError.unexpectedNilValue(field)
     }
         
     return try T(rawSQLData: data)

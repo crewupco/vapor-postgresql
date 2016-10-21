@@ -114,7 +114,7 @@ public struct QueryComponents: CustomStringConvertible {
       }
             
       switch value {
-        case .Text(let string):
+        case .text(let string):
           return string
         default:
           return "BINARY DATA"

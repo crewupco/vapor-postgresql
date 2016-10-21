@@ -31,8 +31,8 @@ public struct SQLDataConversionError: Error {
 }
 
 public enum SQLData {
-  case Text(String)
-  case Binary(Data)
+  case text(String)
+  case binary(Data)
 }
 
 public protocol SQLDataConvertible {
@@ -43,7 +43,7 @@ public protocol SQLDataConvertible {
 
 extension Int: SQLDataConvertible {
   public var sqlData: SQLData {
-    return .Text(String(self))
+    return .text(String(self))
   }
 
   public init(rawSQLData data: Data) throws {
@@ -58,7 +58,7 @@ extension Int: SQLDataConvertible {
 
 extension UInt: SQLDataConvertible {
   public var sqlData: SQLData {
-    return .Text(String(self))
+    return .text(String(self))
   }
   public init(rawSQLData data: Data) throws {
     guard let string = String(data: data, encoding: .utf8),
@@ -72,7 +72,7 @@ extension UInt: SQLDataConvertible {
 
 extension Float: SQLDataConvertible {
   public var sqlData: SQLData {
-    return .Text(String(self))
+    return .text(String(self))
   }
 
   public init(rawSQLData data: Data) throws {
@@ -87,7 +87,7 @@ extension Float: SQLDataConvertible {
 
 extension Double: SQLDataConvertible {
   public var sqlData: SQLData {
-    return .Text(String(self))
+    return .text(String(self))
   }
 
   public init(rawSQLData data: Data) throws {
@@ -102,7 +102,7 @@ extension Double: SQLDataConvertible {
 
 extension String: SQLDataConvertible {
   public var sqlData: SQLData {
-    return .Text(self)
+    return .text(self)
   }
   
   public init(rawSQLData data: Data) throws {
@@ -116,7 +116,7 @@ extension String: SQLDataConvertible {
 
 extension Data: SQLDataConvertible {
   public var sqlData: SQLData {
-    return .Binary(self)
+    return .binary(self)
   }
 
   public init(rawSQLData data: Data) throws {

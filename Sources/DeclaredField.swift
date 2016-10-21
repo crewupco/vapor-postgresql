@@ -108,31 +108,31 @@ public extension DeclaredField {
   }
 
   public func containedIn<T: SQLDataConvertible>(_ values: [T?]) -> Condition {
-    return .In(self, values.map { $0?.sqlData })
+    return .in(self, values.map { $0?.sqlData })
   }
 
   public func containedIn<T: SQLDataConvertible>(_ values: T?...) -> Condition {
-    return .In(self, values.map { $0?.sqlData })
+    return .in(self, values.map { $0?.sqlData })
   }
 
   public func notContainedIn<T: SQLDataConvertible>(_ values: [T?]) -> Condition {
-    return .NotIn(self, values.map { $0?.sqlData })
+    return .notIn(self, values.map { $0?.sqlData })
   }
 
   public func notContainedIn<T: SQLDataConvertible>(_ values: T?...) -> Condition {
-    return .NotIn(self, values.map { $0?.sqlData })
+    return .notIn(self, values.map { $0?.sqlData })
   }
     
   public func equals<T: SQLDataConvertible>(_ value: T?) -> Condition {
-    return .Equals(self, .Value(value?.sqlData))
+    return .equals(self, .value(value?.sqlData))
   }
     
   public func like<T: SQLDataConvertible>(_ value: T?) -> Condition {
-    return .Like(self, value?.sqlData)
+    return .like(self, value?.sqlData)
   }
 
   public func likeIgnoringCase<T: SQLDataConvertible>(_ value: T?) -> Condition {
-    return .ILike(self, value?.sqlData)
+    return .ilike(self, value?.sqlData)
   }
 }
 
@@ -141,39 +141,39 @@ public func == <T: SQLDataConvertible>(lhs: DeclaredField, rhs: T?) -> Condition
 }
 
 public func == (lhs: DeclaredField, rhs: DeclaredField) -> Condition {
-  return .Equals(lhs, .Property(rhs))
+  return .equals(lhs, .property(rhs))
 }
 
 public func > <T: SQLDataConvertible>(lhs: DeclaredField, rhs: T?) -> Condition {
-  return .GreaterThan(lhs, .Value(rhs?.sqlData))
+  return .greaterThan(lhs, .value(rhs?.sqlData))
 }
 
 public func > (lhs: DeclaredField, rhs: DeclaredField) -> Condition {
-  return .GreaterThan(lhs, .Property(rhs))
+  return .greaterThan(lhs, .property(rhs))
 }
 
 public func >= <T: SQLDataConvertible>(lhs: DeclaredField, rhs: T?) -> Condition {
-  return .GreaterThanOrEquals(lhs, .Value(rhs?.sqlData))
+  return .greaterThanOrEquals(lhs, .value(rhs?.sqlData))
 }
 
 public func >= (lhs: DeclaredField, rhs: DeclaredField) -> Condition {
-  return .GreaterThanOrEquals(lhs, .Property(rhs))
+  return .greaterThanOrEquals(lhs, .property(rhs))
 }
 
 public func < <T: SQLDataConvertible>(lhs: DeclaredField, rhs: T?) -> Condition {
-  return .LessThan(lhs, .Value(rhs?.sqlData))
+  return .lessThan(lhs, .value(rhs?.sqlData))
 }
 
 public func < (lhs: DeclaredField, rhs: DeclaredField) -> Condition {
-  return .LessThan(lhs, .Property(rhs))
+  return .lessThan(lhs, .property(rhs))
 }
 
 public func <= <T: SQLDataConvertible>(lhs: DeclaredField, rhs: T?) -> Condition {
-  return .LessThanOrEquals(lhs, .Value(rhs?.sqlData))
+  return .lessThanOrEquals(lhs, .value(rhs?.sqlData))
 }
 
 public func <= (lhs: DeclaredField, rhs: DeclaredField) -> Condition {
-  return .LessThanOrEquals(lhs, .Property(rhs))
+  return .lessThanOrEquals(lhs, .property(rhs))
 }
 
 public protocol FieldProtocol: RawRepresentable, Hashable {

@@ -22,56 +22,56 @@
 
 public indirect enum Condition: QueryComponentsConvertible {
   public enum Key {
-    case Value(SQLData?)
-    case Property(DeclaredField)
+    case value(SQLData?)
+    case property(DeclaredField)
   }
 
-  case Equals(DeclaredField, Key)
+  case equals(DeclaredField, Key)
 
-  case GreaterThan(DeclaredField, Key)
-  case GreaterThanOrEquals(DeclaredField, Key)
+  case greaterThan(DeclaredField, Key)
+  case greaterThanOrEquals(DeclaredField, Key)
 
-  case LessThan(DeclaredField, Key)
-  case LessThanOrEquals(DeclaredField, Key)
+  case lessThan(DeclaredField, Key)
+  case lessThanOrEquals(DeclaredField, Key)
     
-  case Like(DeclaredField, SQLData?)
-  case ILike(DeclaredField, SQLData?)
+  case like(DeclaredField, SQLData?)
+  case ilike(DeclaredField, SQLData?)
   
-  case In(DeclaredField, [SQLData?])
-  case NotIn(DeclaredField, [SQLData?])
+  case `in`(DeclaredField, [SQLData?])
+  case notIn(DeclaredField, [SQLData?])
 
-  case And([Condition])
-  case Or([Condition])
+  case and([Condition])
+  case or([Condition])
 
-  case Not(Condition)
+  case not(Condition)
 
   public var queryComponents: QueryComponents {
     func statementWithKeyValue(_ key: String, _ op: String, _ value: Key) -> QueryComponents {
       switch value {
-        case .Value(let value):
+        case .value(let value):
           return QueryComponents("\(key) \(op) \(QueryComponents.valuePlaceholder)", values: [value])
-        case .Property(let name):
+        case .property(let name):
           return QueryComponents("\(key) \(op) \(name)", values: [])
       }
     }
 
     switch self {
-      case .Equals(let key, let value):
+      case .equals(let key, let value):
         return statementWithKeyValue(key.qualifiedName, "=", value)
 
-      case .GreaterThan(let key, let value):
+      case .greaterThan(let key, let value):
         return statementWithKeyValue(key.qualifiedName, ">", value)
 
-      case .GreaterThanOrEquals(let key, let value):
+      case .greaterThanOrEquals(let key, let value):
         return statementWithKeyValue(key.qualifiedName, ">=", value)
 
-      case .LessThan(let key, let value):
+      case .lessThan(let key, let value):
         return statementWithKeyValue(key.qualifiedName, "<", value)
 
-      case .LessThanOrEquals(let key, let value):
+      case .lessThanOrEquals(let key, let value):
         return statementWithKeyValue(key.qualifiedName, "<=", value)
 
-      case .In(let key, let values):
+      case .in(let key, let values):
         var strings = [String]()
             
         for _ in values {
@@ -80,37 +80,37 @@ public indirect enum Condition: QueryComponentsConvertible {
 
         return QueryComponents("\(key) IN(\(strings.joined(separator: ", ")))", values: values)
 
-      case .NotIn(let key, let values):
-        return (!Condition.In(key, values)).queryComponents
+      case .notIn(let key, let values):
+        return (!Condition.in(key, values)).queryComponents
 
-      case .And(let conditions):
+      case .and(let conditions):
         return QueryComponents(components: conditions.map { $0.queryComponents }, mergedByString: "AND").isolate()
 
-      case .Or(let conditions):
+      case .or(let conditions):
         return QueryComponents(components: conditions.map { $0.queryComponents }, mergedByString: "OR").isolate()
 
-      case .Not(let condition):
+      case .not(let condition):
         var queryComponents = condition.queryComponents.isolate()
         queryComponents.prepend("NOT")
         return queryComponents
             
-      case .Like(let key, let value):
+      case .like(let key, let value):
         return QueryComponents(strings: [key.qualifiedName, "LIKE", QueryComponents.valuePlaceholder], values: [value])
       
-      case .ILike(let key, let value):
+      case .ilike(let key, let value):
         return QueryComponents(strings: [key.qualifiedName, "ILIKE", QueryComponents.valuePlaceholder], values: [value])
     }
   }
 }
 
 public prefix func ! (condition: Condition) -> Condition {
-  return .Not(condition)
+  return .not(condition)
 }
 
 public func && (lhs: Condition, rhs: Condition) -> Condition {
-  return .And([lhs, rhs])
+  return .and([lhs, rhs])
 }
 
 public func || (lhs: Condition, rhs: Condition) -> Condition {
-  return .Or([lhs, rhs])
+  return .or([lhs, rhs])
 }

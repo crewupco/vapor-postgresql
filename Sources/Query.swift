@@ -94,43 +94,43 @@ extension Offset: ExpressibleByIntegerLiteral {
 }
 
 public enum OrderBy: QueryComponentsConvertible {
-  case Ascending(String)
-  case Descending(String)
+  case ascending(String)
+  case descending(String)
     
   public var queryComponents: QueryComponents {
     switch self {
-      case .Ascending(let field):
+      case .ascending(let field):
         return QueryComponents(strings: [field, "ASC"])
-      case .Descending(let field):
+      case .descending(let field):
         return QueryComponents(strings: [field, "DESC"])
     }
   }
 }
 
 public enum DeclaredFieldOrderBy {
-  case Ascending(DeclaredField)
-  case Descending(DeclaredField)
+  case ascending(DeclaredField)
+  case descending(DeclaredField)
     
   public var normalize: OrderBy {
     switch self {
-      case .Ascending(let field):
-        return .Ascending(field.qualifiedName)
-      case .Descending(let field):
-        return .Descending(field.qualifiedName)
+      case .ascending(let field):
+        return .ascending(field.qualifiedName)
+      case .descending(let field):
+        return .descending(field.qualifiedName)
     }
   }
 }
 
 public enum ModelOrderBy<T: Model> {
-  case Ascending(T.Field)
-  case Descending(T.Field)
+  case ascending(T.Field)
+  case descending(T.Field)
     
   public var normalize: DeclaredFieldOrderBy {
     switch self {
-      case .Ascending(let field):
-        return .Ascending(T.field(field))
-      case .Descending(let field):
-        return .Descending(T.field(field))
+      case .ascending(let field):
+        return .ascending(T.field(field))
+      case .descending(let field):
+        return .descending(T.field(field))
     }
   }
 }
@@ -246,7 +246,7 @@ extension FilteredQuery {
     let newCondition: Condition
     
     if let existing = self.condition {
-      newCondition = .And([existing, condition])
+      newCondition = .and([existing, condition])
     }
     else {
       newCondition = condition
@@ -262,20 +262,20 @@ extension FilteredQuery {
 
 public struct Join: QueryComponentsConvertible {
   public enum JoinType: QueryComponentsConvertible {
-    case Inner
-    case Outer
-    case Left
-    case Right
+    case inner
+    case outer
+    case left
+    case right
         
     public var queryComponents: QueryComponents {
       switch self {
-        case .Inner:
+        case .inner:
           return "INNER"
-        case .Outer:
+        case .outer:
           return "OUTER"
-        case .Left:
+        case .left:
           return "LEFT"
-        case .Right:
+        case .right:
           return "RIGHT"
       }
     }
