@@ -24,52 +24,52 @@ import Foundation
 import CPostgreSQLMac
 
 public enum ResultError: Error {
-  case BadStatus(Result.Status, String)
+  case badStatus(Result.Status, String)
 }
 
 public class Result {
   public enum Status: Int {
-    case EmptyQuery
-    case CommandOK
-    case TuplesOK
-    case CopyOut
-    case CopyIn
-    case BadResponse
-    case NonFatalError
-    case FatalError
-    case CopyBoth
-    case SingleTuple
-    case Unknown
+    case emptyQuery
+    case commandOK
+    case tuplesOK
+    case copyOut
+    case copyIn
+    case badResponse
+    case nonFatalError
+    case fatalError
+    case copyBoth
+    case singleTuple
+    case unknown
         
     public init(status: ExecStatusType) {
       switch status {
         case PGRES_EMPTY_QUERY:
-          self = .EmptyQuery
+          self = .emptyQuery
         case PGRES_COMMAND_OK:
-          self = .CommandOK
+          self = .commandOK
         case PGRES_TUPLES_OK:
-          self = .TuplesOK
+          self = .tuplesOK
         case PGRES_COPY_OUT:
-          self = .CopyOut
+          self = .copyOut
         case PGRES_COPY_IN:
-          self = .CopyIn
+          self = .copyIn
         case PGRES_BAD_RESPONSE:
-          self = .BadResponse
+          self = .badResponse
         case PGRES_NONFATAL_ERROR:
-          self = .NonFatalError
+          self = .nonFatalError
         case PGRES_FATAL_ERROR:
-          self = .FatalError
+          self = .fatalError
         case PGRES_COPY_BOTH:
-          self = .CopyBoth
+          self = .copyBoth
         case PGRES_SINGLE_TUPLE:
-          self = .SingleTuple
+          self = .singleTuple
         default:
-          self = .Unknown
+          self = .unknown
       }
     }
         
     public var successful: Bool {
-      return self != .BadResponse && self != .FatalError
+      return self != .badResponse && self != .fatalError
     }
   }
 
@@ -97,7 +97,7 @@ public class Result {
     self.resultPointer = resultPointer
         
     guard status.successful else {
-      throw ResultError.BadStatus(status, String(validatingUTF8: PQresultErrorMessage(resultPointer)) ?? "No error message")
+      throw ResultError.badStatus(status, String(validatingUTF8: PQresultErrorMessage(resultPointer)) ?? "No error message")
     }
   }
     

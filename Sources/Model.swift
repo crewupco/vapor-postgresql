@@ -29,9 +29,9 @@ public struct ModelError: Error {
 }
 
 public enum ModelChangeStatus {
-  case Unknown
-  case Changed
-  case Unchanged
+  case unknown
+  case changed
+  case unchanged
 }
 
 public protocol Model {
@@ -109,10 +109,10 @@ public extension Model {
   
   public var hasChanged: ModelChangeStatus {
     guard let changedFields = changedFields else {
-      return .Unknown
+      return .unknown
     }
     
-    return changedFields.isEmpty ? .Unchanged : .Changed
+    return changedFields.isEmpty ? .unchanged : .changed
   }
   
   public var changedValuesByField: [Field: SQLDataConvertible?]? {

@@ -31,39 +31,39 @@ public class Connection {
   public static let willExecuteSQL = Notification.Name("PostgreSQL.Connection.willExecuteSQL") // object = "<sql>"
   
   public enum InternalStatus {
-    case Bad
-    case Started
-    case Made
-    case AwatingResponse
-    case AuthOK
-    case SettingEnvironment
-    case SSLStartup
-    case OK
-    case Unknown
-    case Needed
+    case bad
+    case started
+    case made
+    case awaitingResponse
+    case authOK
+    case settingEnvironment
+    case sslStartup
+    case ok
+    case unknown
+    case needed
         
     public init(status: ConnStatusType) {
       switch status {
         case CONNECTION_NEEDED:
-          self = .Needed
+          self = .needed
         case CONNECTION_OK:
-          self = .OK
+          self = .ok
         case CONNECTION_STARTED:
-          self = .Started
+          self = .started
         case CONNECTION_MADE:
-          self = .Made
+          self = .made
         case CONNECTION_AWAITING_RESPONSE:
-          self = .AwatingResponse
+          self = .awaitingResponse
         case CONNECTION_AUTH_OK:
-          self = .AuthOK
+          self = .authOK
         case CONNECTION_SSL_STARTUP:
-          self = .SSLStartup
+          self = .sslStartup
         case CONNECTION_SETENV:
-          self = .SettingEnvironment
+          self = .settingEnvironment
         case CONNECTION_BAD:
-          self = .Bad
+          self = .bad
         default:
-          self = .Unknown
+          self = .unknown
       }
     }
   }
@@ -161,9 +161,9 @@ public class Connection {
       let data: AnyCollection<Int8>
         
       switch value {
-        case .Binary(let value):
+        case .binary(let value):
           data = AnyCollection(value.map { Int8($0) })
-        case .Text(let string):
+        case .text(let string):
           data = AnyCollection(string.utf8CString)
       }
               
