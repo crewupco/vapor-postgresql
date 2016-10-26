@@ -40,11 +40,14 @@ public indirect enum Condition: QueryComponentsConvertible {
   case `in`(DeclaredField, [SQLData?])
   case notIn(DeclaredField, [SQLData?])
 
+  case null(DeclaredField)
+  case notNull(DeclaredField)
+
   case and([Condition])
   case or([Condition])
 
   case not(Condition)
-
+  
   public var queryComponents: QueryComponents {
     func statementWithKeyValue(_ key: String, _ op: String, _ value: Key) -> QueryComponents {
       switch value {
@@ -82,6 +85,12 @@ public indirect enum Condition: QueryComponentsConvertible {
 
       case .notIn(let key, let values):
         return (!Condition.in(key, values)).queryComponents
+
+      case .null(let key):
+        return QueryComponents("\(key) IS NULL", values: [])
+
+      case .notNull(let key):
+        return QueryComponents("\(key) IS NOT NULL", values: [])
 
       case .and(let conditions):
         return QueryComponents(components: conditions.map { $0.queryComponents }, mergedByString: "AND").isolate()
