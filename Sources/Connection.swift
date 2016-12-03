@@ -134,7 +134,7 @@ public class Connection {
     
   @discardableResult
   public func execute(_ components: QueryComponents) throws -> Result {
-#if DEBUG
+#if Xcode
     DispatchQueue.global(qos: .background).async() {
       NotificationCenter.default.post(name: Connection.willExecuteSQL, object: components.string, userInfo: nil)
     }
