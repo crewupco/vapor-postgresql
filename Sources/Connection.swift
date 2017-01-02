@@ -217,19 +217,20 @@ public class Connection {
     return try execute(convertible.queryComponents)
   }
   
-  public func transaction(block: (Void) throws -> Void) throws {
+  public func transaction<T>(block: (Void) throws -> T) throws -> T {
     try begin()
     
     do {
-      try block()
+      let value = try block()
       try commit()
+      return value
     }
     catch {
       try rollback()
       throw error
     }
   }
-  
+
   @discardableResult
   public func begin() throws -> Result {
     return try execute("BEGIN")
