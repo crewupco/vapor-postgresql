@@ -20,30 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct Select: SelectQuery {
-  public let fields: [DeclaredField]
+public struct Count: CountQuery {
   public let tableName: String
   public var condition: Condition? = nil
   public var joins: [Join] = []
-  public var offset: Offset? = nil
-  public var limit: Limit? = nil
-  public var orderBy: [OrderBy] = []
-    
-  public init(_ fields: [DeclaredField], from tableName: String) {
-    self.tableName = tableName
-    self.fields = fields
-  }
-    
+  
   public init(from tableName: String) {
     self.tableName = tableName
-    self.fields = []
   }
     
-  public init(_ fields: [String], from tableName: String) {
-    self.init(fields.map { DeclaredField(name: $0) }, from: tableName)
-  }
-    
-  public func join(_ tableName: String, using type: [Join.JoinType], leftKey: String, rightKey: String) -> Select {
+  public func join(_ tableName: String, using type: [Join.JoinType], leftKey: String, rightKey: String) -> Count {
     var new = self
     
     new.joins.append(Join(tableName, type: type, leftKey: leftKey, rightKey: rightKey))
@@ -51,26 +37,22 @@ public struct Select: SelectQuery {
     return new
   }
     
-  public func join(_ tableName: String, using type: Join.JoinType, leftKey: String, rightKey: String) -> Select {
+  public func join(_ tableName: String, using type: Join.JoinType, leftKey: String, rightKey: String) -> Count {
     return join(tableName, using: [type], leftKey: leftKey, rightKey: rightKey)
   }
 }
 
-public struct ModelSelect<T: Model>: SelectQuery, ModelQuery {
+public struct ModelCount<T: Model>: CountQuery, ModelQuery {
   public typealias ModelType = T
     
   public var tableName: String {
     return T.tableName
   }
     
-  public let fields: [DeclaredField]
   public var condition: Condition? = nil
   public var joins: [Join] = []
-  public var offset: Offset? = nil
-  public var limit: Limit? = nil
-  public var orderBy: [OrderBy] = []
-    
-  public func join<R: Model>(_ model: R.Type, using type: [Join.JoinType], leftKey: ModelType.Field, rightKey: R.Field) -> ModelSelect<T> {
+  
+  public func join<R: Model>(_ model: R.Type, using type: [Join.JoinType], leftKey: ModelType.Field, rightKey: R.Field) -> ModelCount<T> {
     var new = self
     
     new.joins.append(
@@ -80,26 +62,21 @@ public struct ModelSelect<T: Model>: SelectQuery, ModelQuery {
     return new
   }
     
-  public func join<R: Model>(_ model: R.Type, using type: Join.JoinType, leftKey: ModelType.Field, rightKey: R.Field) -> ModelSelect<T> {
+  public func join<R: Model>(_ model: R.Type, using type: Join.JoinType, leftKey: ModelType.Field, rightKey: R.Field) -> ModelCount<T> {
     return join(model, using: [type], leftKey: leftKey, rightKey: rightKey)
   }
-
-  public init(_ fields: [DeclaredField]? = nil) {
-    self.fields = fields ?? T.selectFields.map { T.field($0) }
-  }
 }
 
-public protocol SelectQuery: FilteredQuery, FetchQuery {
+public protocol CountQuery: FilteredQuery, TableQuery {
   var joins: [Join] { get set }
-  var fields: [DeclaredField] { get }
 }
 
-public extension SelectQuery {
+public extension CountQuery {
   public var queryComponents: QueryComponents {
     var components = QueryComponents(components: [
-      "SELECT",
-      fields.isEmpty ? QueryComponents("\(tableName).*") : fields.queryComponentsForSelectingFields(useQualifiedNames: true, useAliasing: true, isolateQueryComponents: false),
-      "FROM",
+      "SELECT COUNT(",
+      QueryComponents("\(tableName).*"),
+      ") FROM",
       QueryComponents(tableName)
     ])
         
@@ -111,20 +88,11 @@ public extension SelectQuery {
       components.append("WHERE")
       components.append(condition.queryComponents)
     }
-        
-    if !orderBy.isEmpty {
-      components.append("ORDER BY")
-      components.append(orderBy.queryComponents(mergedByString: ","))
-    }
-        
-    if let limit = limit {
-      components.append(limit.queryComponents)
-      }
-        
-    if let offset = offset {
-      components.append(offset.queryComponents)
-    }
-        
+    
     return components
+  }
+  
+  public func fetch(_ connection: Connection) throws -> Int {
+    return try connection.execute(self).first?.value("count") ?? 0
   }
 }
