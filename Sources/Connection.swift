@@ -71,7 +71,7 @@ public class Connection {
   public let connectionInfo: ConnectionInfo
 
   public var mostRecentError: ConnectionError? {
-    guard let errorString = String(validatingUTF8: PQerrorMessage(connection)) , !errorString.isEmpty else {
+    guard let errorString = String(validatingUTF8: PQerrorMessage(connection)), !errorString.isEmpty else {
       return nil
     }
     
@@ -82,7 +82,7 @@ public class Connection {
     return InternalStatus(status: PQstatus(self.connection))
   }
   
-  fileprivate var connection: OpaquePointer? = nil
+  fileprivate var connection: OpaquePointer?
 
   public required init(info: ConnectionInfo) {
     self.connectionInfo = info
@@ -149,7 +149,7 @@ public class Connection {
     }
 
     var parameterData: [UnsafePointer<Int8>?] = []
-    var deallocators = [() -> ()]()
+    var deallocators = [() -> Void]()
     defer { deallocators.forEach { $0() } }
 
     for parameter in components.values {

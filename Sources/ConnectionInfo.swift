@@ -58,4 +58,3 @@ public struct ConnectionInfo {
     self.tty = tty
   }
 }
-

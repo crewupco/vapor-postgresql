@@ -22,7 +22,7 @@
 
 public struct Delete: DeleteQuery {
   public let tableName: String
-  public var condition: Condition? = nil
+  public var condition: Condition?
     
   public init(from tableName: String) {
     self.tableName = tableName
@@ -36,7 +36,7 @@ public struct ModelDelete<T: Model>: DeleteQuery {
     return ModelType.tableName
   }
     
-  public var condition: Condition? = nil
+  public var condition: Condition?
 }
 
 public protocol DeleteQuery: FilteredQuery, TableQuery {}

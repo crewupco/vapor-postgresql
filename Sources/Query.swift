@@ -259,7 +259,6 @@ extension FilteredQuery {
   }
 }
 
-
 public struct Join: QueryComponentsConvertible {
   public enum JoinType: QueryComponentsConvertible {
     case inner

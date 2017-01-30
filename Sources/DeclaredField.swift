@@ -55,7 +55,7 @@ public extension Sequence where Iterator.Element == DeclaredField {
   }
 }
 
-public extension Collection where Iterator.Element == (DeclaredField, Optional<SQLData>) {
+public extension Collection where Iterator.Element == (DeclaredField, SQLData?) {
   public func queryComponentsForSettingValues(useQualifiedNames useQualified: Bool) -> QueryComponents {
     let string = map { (field, value) in
       var str = useQualified ? field.qualifiedName : field.unqualifiedName
@@ -187,4 +187,3 @@ public func <= (lhs: DeclaredField, rhs: DeclaredField) -> Condition {
 public protocol FieldProtocol: RawRepresentable, Hashable {
   var rawValue: String { get }
 }
-

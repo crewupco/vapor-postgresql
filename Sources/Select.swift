@@ -23,10 +23,10 @@
 public struct Select: SelectQuery {
   public let fields: [DeclaredField]
   public let tableName: String
-  public var condition: Condition? = nil
+  public var condition: Condition?
   public var joins: [Join] = []
-  public var offset: Offset? = nil
-  public var limit: Limit? = nil
+  public var offset: Offset?
+  public var limit: Limit?
   public var orderBy: [OrderBy] = []
     
   public init(_ fields: [DeclaredField], from tableName: String) {
@@ -64,10 +64,10 @@ public struct ModelSelect<T: Model>: SelectQuery, ModelQuery {
   }
     
   public let fields: [DeclaredField]
-  public var condition: Condition? = nil
+  public var condition: Condition?
   public var joins: [Join] = []
-  public var offset: Offset? = nil
-  public var limit: Limit? = nil
+  public var offset: Offset?
+  public var limit: Limit?
   public var orderBy: [OrderBy] = []
     
   public func join<R: Model>(_ model: R.Type, using type: [Join.JoinType], leftKey: ModelType.Field, rightKey: R.Field) -> ModelSelect<T> {

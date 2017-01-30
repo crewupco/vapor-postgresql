@@ -5,8 +5,3 @@ set -v
 cd -P -- "$(dirname -- "$0")/.."
 
 swift package generate-xcodeproj -Xcc -I/usr/local/include -Xlinker -L/usr/local/lib -Xswiftc -I/usr/local/include
-
-echo "OTHER_LDFLAGS = -L/usr/local/lib" >> VaporPostgreSQL.xcodeproj/configs/project.xcconfig
-echo "OTHER_SWIFT_FLAGS = -I/usr/local/include -DXcode" >> VaporPostgreSQL.xcodeproj/configs/project.xcconfig
-echo "OTHER_SWIFT_FLAGS[config=Debug] = -DXcode -DDEBUG" >> VaporPostgreSQL.xcodeproj/configs/project.xcconfig
-echo "OTHER_SWIFT_FLAGS[config=Release] = -DXcode -DRELEASE" >> VaporPostgreSQL.xcodeproj/configs/project.xcconfig

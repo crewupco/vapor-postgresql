@@ -22,7 +22,7 @@
 
 public struct Count: CountQuery {
   public let tableName: String
-  public var condition: Condition? = nil
+  public var condition: Condition?
   public var joins: [Join] = []
   
   public init(from tableName: String) {
@@ -49,7 +49,7 @@ public struct ModelCount<T: Model>: CountQuery, ModelQuery {
     return T.tableName
   }
     
-  public var condition: Condition? = nil
+  public var condition: Condition?
   public var joins: [Join] = []
   
   public func join<R: Model>(_ model: R.Type, using type: [Join.JoinType], leftKey: ModelType.Field, rightKey: R.Field) -> ModelCount<T> {

@@ -80,7 +80,7 @@ public struct ModelInsert<T: Model>: InsertQuery {
   }
 }
 
-public protocol InsertQuery : TableQuery {
+public protocol InsertQuery: TableQuery {
   var valuesByField: [DeclaredField: SQLData?] { get }
 }
 

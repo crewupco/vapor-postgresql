@@ -155,7 +155,7 @@ public extension Model {
     self.changedFields = changedFields
   }
     
-  public static func get(_ pk: Self.PrimaryKey, connection: Connection) throws -> Self?  {
+  public static func get(_ pk: Self.PrimaryKey, connection: Connection) throws -> Self? {
     return try selectQuery.filter(declaredPrimaryKeyField == pk).first(connection)
   }
     
