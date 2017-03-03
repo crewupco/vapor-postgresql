@@ -86,6 +86,10 @@ public extension Model {
     return DeclaredField(name: field, tableName: Self.tableName)
   }
   
+  public static func columnName(_ field: Field) -> String {
+    return field.rawValue
+  }
+  
   public static var selectQuery: ModelSelect<Self> {
     return ModelSelect()
   }
