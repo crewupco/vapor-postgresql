@@ -23,6 +23,7 @@
 public struct Select: SelectQuery {
   public let fields: [DeclaredField]
   public let tableName: String
+  public var distinct: Bool = false
   public var condition: Condition?
   public var joins: [Join] = []
   public var offset: Offset?
@@ -41,6 +42,14 @@ public struct Select: SelectQuery {
     
   public init(_ fields: [String], from tableName: String) {
     self.init(fields.map { DeclaredField(name: $0) }, from: tableName)
+  }
+  
+  public func distinct(_ distinct: Bool = true) -> Select {
+    var new = self
+    
+    new.distinct = distinct
+    
+    return new
   }
     
   public func join(_ tableName: String, using type: [Join.JoinType], leftKey: String, rightKey: String) -> Select {
@@ -64,12 +73,21 @@ public struct ModelSelect<T: Model>: SelectQuery, ModelQuery {
   }
     
   public let fields: [DeclaredField]
+  public var distinct: Bool = false
   public var condition: Condition?
   public var joins: [Join] = []
   public var offset: Offset?
   public var limit: Limit?
   public var orderBy: [OrderBy] = []
+
+  public func distinct(_ distinct: Bool = true) -> ModelSelect<T> {
+    var new = self
     
+    new.distinct = distinct
+    
+    return new
+  }
+  
   public func join<R: Model>(_ model: R.Type, using type: [Join.JoinType], leftKey: ModelType.Field, rightKey: R.Field) -> ModelSelect<T> {
     var new = self
     
@@ -97,7 +115,7 @@ public protocol SelectQuery: FilteredQuery, FetchQuery {
 public extension SelectQuery {
   public var queryComponents: QueryComponents {
     var components = QueryComponents(components: [
-      "SELECT",
+      distinct ? "SELECT DISTINCT" : "SELECT",
       fields.isEmpty ? QueryComponents("\(tableName).*") : fields.queryComponentsForSelectingFields(useQualifiedNames: true, useAliasing: true, isolateQueryComponents: false),
       "FROM",
       QueryComponents(tableName)

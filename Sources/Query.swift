@@ -142,6 +142,7 @@ public extension Sequence where Self.Iterator.Element == OrderBy {
 }
 
 public protocol FetchQuery: TableQuery {
+  var distinct: Bool { get set }
   var offset: Offset? { get set }
   var limit: Limit? { get set }
   var orderBy: [OrderBy] { get set }
