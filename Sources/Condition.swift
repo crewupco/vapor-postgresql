@@ -48,6 +48,8 @@ public indirect enum Condition: QueryComponentsConvertible {
 
   case not(Condition)
   
+  case sql(String, [SQLData?])
+  
   public var queryComponents: QueryComponents {
     func statementWithKeyValue(_ key: String, _ op: String, _ value: Key) -> QueryComponents {
       switch value {
@@ -108,6 +110,9 @@ public indirect enum Condition: QueryComponentsConvertible {
       
       case .ilike(let key, let value):
         return QueryComponents(strings: [key.qualifiedName, "ILIKE", QueryComponents.valuePlaceholder], values: [value])
+      
+      case .sql(let sql, let values):
+        return QueryComponents(sql, values: values)
     }
   }
 }
