@@ -83,7 +83,7 @@ public indirect enum Condition: QueryComponentsConvertible {
           strings.append(QueryComponents.valuePlaceholder)
         }
 
-        return QueryComponents("\(key) IN(\(strings.joined(separator: ", ")))", values: values)
+        return QueryComponents("\(key) IN (\(strings.joined(separator: ", ")))", values: values)
 
       case .notIn(let key, let values):
         return (!Condition.in(key, values)).queryComponents
@@ -112,7 +112,7 @@ public indirect enum Condition: QueryComponentsConvertible {
         return QueryComponents(strings: [key.qualifiedName, "ILIKE", QueryComponents.valuePlaceholder], values: [value])
       
       case .sql(let sql, let values):
-        return QueryComponents(sql, values: values)
+        return QueryComponents(sql, values: values).isolate()
     }
   }
 }
