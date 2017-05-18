@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 import Foundation
-import CPostgreSQLMac
+import CPostgreSQL
 
 public struct ConnectionError: Error, CustomStringConvertible {
   public let description: String

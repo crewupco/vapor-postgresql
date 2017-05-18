@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 import Foundation
-import CPostgreSQLMac
+import CPostgreSQL
 
 public enum ResultError: Error {
   case badStatus(Result.Status, String)
