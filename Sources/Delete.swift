@@ -20,25 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct Delete: DeleteQuery {
-  public let tableName: String
-  public var condition: Condition?
-    
-  public init(from tableName: String) {
-    self.tableName = tableName
-  }
-}
-
-public struct ModelDelete<T: Model>: DeleteQuery {
-  public typealias ModelType = T
-    
-  public var tableName: String {
-    return ModelType.tableName
-  }
-    
-  public var condition: Condition?
-}
-
 public protocol DeleteQuery: FilteredQuery, TableQuery {}
 
 extension DeleteQuery {
@@ -56,4 +37,23 @@ extension DeleteQuery {
         
     return queryComponents
   }
+}
+
+public struct Delete: DeleteQuery {
+  public let tableName: String
+  public var condition: Condition?
+    
+  public init(from tableName: String) {
+    self.tableName = tableName
+  }
+}
+
+public struct ModelDelete<T: Model>: DeleteQuery {
+  public typealias ModelType = T
+    
+  public var tableName: String {
+    return ModelType.tableName
+  }
+    
+  public var condition: Condition?
 }

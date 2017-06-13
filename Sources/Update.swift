@@ -20,6 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+public protocol UpdateQuery: FilteredQuery, TableQuery {
+  var valuesByField: [DeclaredField: SQLData?] { get set }
+}
+
+public extension UpdateQuery {
+  public var queryComponents: QueryComponents {
+    var components =  QueryComponents(components: [
+      "UPDATE",
+      QueryComponents(tableName),
+      "SET",
+      valuesByField.map { $0 }.queryComponentsForSettingValues(useQualifiedNames: false)
+      ])
+    
+    if let condition = condition {
+      components.append("WHERE")
+      components.append(condition.queryComponents)
+    }
+    
+    return components
+  }
+
+  public mutating func set(_ value: SQLData?, forField field: DeclaredField) {
+    valuesByField[field] = value
+  }
+    
+  public mutating func set(_ value: SQLDataConvertible?, forField field: DeclaredField) {
+    self.set(value?.sqlData, forField: field)
+  }
+}
+
 public struct Update: UpdateQuery {
   public let tableName: String
   public var valuesByField: [DeclaredField: SQLData?]
@@ -77,35 +107,5 @@ public struct ModelUpdate<T: Model>: UpdateQuery {
     
   public mutating func set(_ value: SQLDataConvertible?, forField field: ModelType.Field) {
     set(value?.sqlData, forField: field)
-  }
-}
-
-public protocol UpdateQuery: FilteredQuery, TableQuery {
-  var valuesByField: [DeclaredField: SQLData?] { get set }
-}
-
-public extension UpdateQuery {
-  public var queryComponents: QueryComponents {
-    var components =  QueryComponents(components: [
-      "UPDATE",
-      QueryComponents(tableName),
-      "SET",
-      valuesByField.map { $0 }.queryComponentsForSettingValues(useQualifiedNames: false)
-      ])
-    
-    if let condition = condition {
-      components.append("WHERE")
-      components.append(condition.queryComponents)
-    }
-    
-    return components
-  }
-
-  public mutating func set(_ value: SQLData?, forField field: DeclaredField) {
-    valuesByField[field] = value
-  }
-    
-  public mutating func set(_ value: SQLDataConvertible?, forField field: DeclaredField) {
-    self.set(value?.sqlData, forField: field)
   }
 }

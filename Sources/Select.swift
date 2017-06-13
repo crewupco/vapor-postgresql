@@ -20,6 +20,46 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+public protocol SelectQuery: FilteredQuery, FetchQuery {
+  var joins: [Join] { get set }
+  var fields: [DeclaredField] { get }
+}
+
+public extension SelectQuery {
+  public var queryComponents: QueryComponents {
+    var components = QueryComponents(components: [
+      distinct ? "SELECT DISTINCT" : "SELECT",
+      fields.isEmpty ? QueryComponents("\(tableName).*") : fields.queryComponentsForSelectingFields(useQualifiedNames: true, useAliasing: true, isolateQueryComponents: false),
+      "FROM",
+      QueryComponents(tableName)
+    ])
+        
+    if !joins.isEmpty {
+      components.append(joins.queryComponents)
+    }
+        
+    if let condition = condition {
+      components.append("WHERE")
+      components.append(condition.queryComponents)
+    }
+        
+    if !orderBy.isEmpty {
+      components.append("ORDER BY")
+      components.append(orderBy.queryComponents(mergedByString: ","))
+    }
+        
+    if let limit = limit {
+      components.append(limit.queryComponents)
+      }
+        
+    if let offset = offset {
+      components.append(offset.queryComponents)
+    }
+        
+    return components
+  }
+}
+
 public struct Select: SelectQuery {
   public let fields: [DeclaredField]
   public let tableName: String
@@ -104,45 +144,5 @@ public struct ModelSelect<T: Model>: SelectQuery, ModelQuery {
 
   public init(_ fields: [DeclaredField]? = nil) {
     self.fields = fields ?? T.selectFields.map { T.field($0) }
-  }
-}
-
-public protocol SelectQuery: FilteredQuery, FetchQuery {
-  var joins: [Join] { get set }
-  var fields: [DeclaredField] { get }
-}
-
-public extension SelectQuery {
-  public var queryComponents: QueryComponents {
-    var components = QueryComponents(components: [
-      distinct ? "SELECT DISTINCT" : "SELECT",
-      fields.isEmpty ? QueryComponents("\(tableName).*") : fields.queryComponentsForSelectingFields(useQualifiedNames: true, useAliasing: true, isolateQueryComponents: false),
-      "FROM",
-      QueryComponents(tableName)
-    ])
-        
-    if !joins.isEmpty {
-      components.append(joins.queryComponents)
-    }
-        
-    if let condition = condition {
-      components.append("WHERE")
-      components.append(condition.queryComponents)
-    }
-        
-    if !orderBy.isEmpty {
-      components.append("ORDER BY")
-      components.append(orderBy.queryComponents(mergedByString: ","))
-    }
-        
-    if let limit = limit {
-      components.append(limit.queryComponents)
-      }
-        
-    if let offset = offset {
-      components.append(offset.queryComponents)
-    }
-        
-    return components
   }
 }

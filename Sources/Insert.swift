@@ -20,6 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+public protocol InsertQuery: TableQuery {
+  var valuesByField: [DeclaredField: SQLData?] { get }
+}
+
+extension InsertQuery {
+  public var queryComponents: QueryComponents {
+    return QueryComponents(
+      components: [
+        "INSERT INTO",
+        QueryComponents(tableName),
+        valuesByField.keys.queryComponentsForSelectingFields(useQualifiedNames: false, useAliasing: false, isolateQueryComponents: true),
+        "VALUES",
+        valuesByField.map { $0 }.queryComponentsForValuePlaceHolders(isolated: true)
+      ]
+    )
+  }
+}
+
 public struct Insert: InsertQuery {
   public let tableName: String
   public let valuesByField: [DeclaredField: SQLData?]
@@ -77,23 +95,5 @@ public struct ModelInsert<T: Model>: InsertQuery {
     }
         
     self.valuesByField = dict
-  }
-}
-
-public protocol InsertQuery: TableQuery {
-  var valuesByField: [DeclaredField: SQLData?] { get }
-}
-
-extension InsertQuery {
-  public var queryComponents: QueryComponents {
-    return QueryComponents(
-      components: [
-        "INSERT INTO",
-        QueryComponents(tableName),
-        valuesByField.keys.queryComponentsForSelectingFields(useQualifiedNames: false, useAliasing: false, isolateQueryComponents: true),
-        "VALUES",
-        valuesByField.map { $0 }.queryComponentsForValuePlaceHolders(isolated: true)
-      ]
-    )
   }
 }

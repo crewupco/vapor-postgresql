@@ -20,6 +20,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+public protocol CountQuery: FilteredQuery, TableQuery {
+  var distinctFieldName: String? { get set }
+  var joins: [Join] { get set }
+}
+
+public extension CountQuery {
+  public var queryComponents: QueryComponents {
+    var components = QueryComponents(components: ["SELECT COUNT("])
+    
+    if let distinctFieldName = distinctFieldName {
+      components.append("DISTINCT")
+      components.append(QueryComponents("\(tableName).\(distinctFieldName)"))
+    }
+    else {
+      components.append(QueryComponents("\(tableName).*"))
+    }
+
+    components.append(") FROM")
+    components.append(QueryComponents(tableName))
+    
+    if !joins.isEmpty {
+      components.append(joins.queryComponents)
+    }
+        
+    if let condition = condition {
+      components.append("WHERE")
+      components.append(condition.queryComponents)
+    }
+    
+    return components
+  }
+  
+  public func fetch(_ connection: Connection) throws -> Int {
+    return try connection.execute(self).first?.value("count") ?? 0
+  }
+}
+
 public struct Count: CountQuery {
   public let tableName: String
   public var distinctFieldName: String?
@@ -82,42 +119,5 @@ public struct ModelCount<T: Model>: CountQuery, ModelQuery {
     
   public func join<R: Model>(_ model: R.Type, using type: Join.JoinType, leftKey: ModelType.Field, rightKey: R.Field) -> ModelCount<T> {
     return join(model, using: [type], leftKey: leftKey, rightKey: rightKey)
-  }
-}
-
-public protocol CountQuery: FilteredQuery, TableQuery {
-  var distinctFieldName: String? { get set }
-  var joins: [Join] { get set }
-}
-
-public extension CountQuery {
-  public var queryComponents: QueryComponents {
-    var components = QueryComponents(components: ["SELECT COUNT("])
-    
-    if let distinctFieldName = distinctFieldName {
-      components.append("DISTINCT")
-      components.append(QueryComponents("\(tableName).\(distinctFieldName)"))
-    }
-    else {
-      components.append(QueryComponents("\(tableName).*"))
-    }
-
-    components.append(") FROM")
-    components.append(QueryComponents(tableName))
-    
-    if !joins.isEmpty {
-      components.append(joins.queryComponents)
-    }
-        
-    if let condition = condition {
-      components.append("WHERE")
-      components.append(condition.queryComponents)
-    }
-    
-    return components
-  }
-  
-  public func fetch(_ connection: Connection) throws -> Int {
-    return try connection.execute(self).first?.value("count") ?? 0
   }
 }
