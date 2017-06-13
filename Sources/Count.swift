@@ -22,6 +22,7 @@
 
 public struct Count: CountQuery {
   public let tableName: String
+  public var distinctFieldName: String?
   public var condition: Condition?
   public var joins: [Join] = []
   
@@ -29,6 +30,14 @@ public struct Count: CountQuery {
     self.tableName = tableName
   }
     
+  public func distinct(_ fieldName: String = "*") -> Count {
+    var new = self
+    
+    new.distinctFieldName = fieldName
+    
+    return new
+  }
+
   public func join(_ tableName: String, using type: [Join.JoinType], leftKey: String, rightKey: String) -> Count {
     var new = self
     
@@ -49,9 +58,18 @@ public struct ModelCount<T: Model>: CountQuery, ModelQuery {
     return T.tableName
   }
     
+  public var distinctFieldName: String?
   public var condition: Condition?
   public var joins: [Join] = []
   
+  public func distinct(_ distinctField: ModelType.Field) -> ModelCount<T> {
+    var new = self
+    
+    new.distinctFieldName = distinctField.rawValue
+    
+    return new
+  }
+
   public func join<R: Model>(_ model: R.Type, using type: [Join.JoinType], leftKey: ModelType.Field, rightKey: R.Field) -> ModelCount<T> {
     var new = self
     
@@ -68,18 +86,25 @@ public struct ModelCount<T: Model>: CountQuery, ModelQuery {
 }
 
 public protocol CountQuery: FilteredQuery, TableQuery {
+  var distinctFieldName: String? { get set }
   var joins: [Join] { get set }
 }
 
 public extension CountQuery {
   public var queryComponents: QueryComponents {
-    var components = QueryComponents(components: [
-      "SELECT COUNT(",
-      QueryComponents("\(tableName).*"),
-      ") FROM",
-      QueryComponents(tableName)
-    ])
-        
+    var components = QueryComponents(components: ["SELECT COUNT("])
+    
+    if let distinctFieldName = distinctFieldName {
+      components.append("DISTINCT")
+      components.append(QueryComponents("\(tableName).\(distinctFieldName)"))
+    }
+    else {
+      components.append(QueryComponents("\(tableName).*"))
+    }
+
+    components.append(") FROM")
+    components.append(QueryComponents(tableName))
+    
     if !joins.isEmpty {
       components.append(joins.queryComponents)
     }
