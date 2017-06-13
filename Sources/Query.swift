@@ -36,7 +36,7 @@ public protocol ModelQuery: TableQuery {
   associatedtype ModelType: Model
 }
 
-public extension ModelQuery where Self: FetchQuery {
+public extension ModelQuery where Self: SelectQuery {
   public func fetch(_ connection: Connection) throws -> [ModelType] {
     return try connection.execute(self).map { try ModelType(row: $0) }
   }
@@ -138,103 +138,6 @@ public enum ModelOrderBy<T: Model> {
 public extension Sequence where Self.Iterator.Element == OrderBy {
   public var queryComponents: QueryComponents {
     return QueryComponents(components: map { $0.queryComponents })
-  }
-}
-
-public protocol FetchQuery: TableQuery {
-  var distinct: Bool { get set }
-  var offset: Offset? { get set }
-  var limit: Limit? { get set }
-  var orderBy: [OrderBy] { get set }
-}
-
-public extension FetchQuery {
-  public var pageSize: Int? {
-    get {
-      return limit?.value
-    }
-    set {
-      guard let value = newValue else {
-        limit = nil
-        return
-      }
-      limit = Limit(value)
-    }
-  }
-    
-  public func page(_ value: Int?) -> Self {
-    var new = self
-    new.page = value
-    return new
-  }
-    
-  public func pageSize(_ value: Int?) -> Self {
-    var new = self
-    new.pageSize = value
-    return new
-  }
-    
-  public var page: Int? {
-    set {
-      guard let value = newValue, let limit = limit else {
-        offset = nil
-        return
-      }
-      
-      offset = Offset(value * limit.value)
-    }
-        
-    get {
-      guard let offset = offset, let limit = limit else {
-        return nil
-      }
-            
-      return offset.value / limit.value
-    }
-  }
-    
-  public func orderBy(_ values: [OrderBy]) -> Self {
-    var new = self
-    new.orderBy.append(contentsOf: values)
-    return new
-  }
-    
-  public func orderBy(_ values: OrderBy...) -> Self {
-    return orderBy(values)
-  }
-    
-  public func orderBy(_ values: [DeclaredFieldOrderBy]) -> Self {
-    return orderBy(values.map { $0.normalize })
-  }
-    
-  public func orderBy(_ values: DeclaredFieldOrderBy...) -> Self {
-    return orderBy(values)
-  }
-    
-  public func limit(_ value: Int?) -> Self {
-    var new = self
-    
-    if let value = value {
-      new.limit = Limit(value)
-    }
-    else {
-      new.limit = nil
-    }
-    
-    return new
-  }
-    
-  public func offset(_ value: Int?) -> Self {
-    var new = self
-    
-    if let value = value {
-      new.offset = Offset(value)
-    }
-    else {
-      new.offset = nil
-    }
-    
-    return new
   }
 }
 
