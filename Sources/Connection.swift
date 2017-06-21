@@ -217,7 +217,7 @@ public class Connection {
     return try execute(convertible.queryComponents)
   }
   
-  public func transaction<T>(block: (Void) throws -> T) throws -> T {
+  public func transaction<T>(block: () throws -> T) throws -> T {
     try begin()
     
     do {
@@ -261,7 +261,7 @@ public class Connection {
     return try execute("RELEASE SAVEPOINT \(name)")
   }
   
-  public func withSavePointNamed(_ name: String, block: (Void) throws -> Void) throws {
+  public func withSavePointNamed(_ name: String, block: () throws -> Void) throws {
     try createSavePointNamed(name)
     
     do {

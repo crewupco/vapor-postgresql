@@ -30,10 +30,10 @@ public enum RowError: Error {
 public struct RowIterator {
   public typealias Element = Row
   
-  let block: (Void) -> Element?
+  let block: () -> Element?
   var index: Int = 0
   
-  init(block: @escaping (Void) -> Element?) {
+  init(block: @escaping () -> Element?) {
     self.block = block
   }
   
