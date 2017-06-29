@@ -27,27 +27,19 @@ public indirect enum Condition: QueryComponentsConvertible {
   }
 
   case equals(DeclaredField, Key)
-
   case greaterThan(DeclaredField, Key)
   case greaterThanOrEquals(DeclaredField, Key)
-
   case lessThan(DeclaredField, Key)
   case lessThanOrEquals(DeclaredField, Key)
-    
   case like(DeclaredField, SQLData?)
   case ilike(DeclaredField, SQLData?)
-  
   case `in`(DeclaredField, [SQLData?])
   case notIn(DeclaredField, [SQLData?])
-
   case null(DeclaredField)
   case notNull(DeclaredField)
-
   case and([Condition])
   case or([Condition])
-
   case not(Condition)
-  
   case sql(String, [SQLData?])
   
   public var queryComponents: QueryComponents {
@@ -63,54 +55,35 @@ public indirect enum Condition: QueryComponentsConvertible {
     switch self {
       case .equals(let key, let value):
         return statementWithKeyValue(key.qualifiedName, "=", value)
-
       case .greaterThan(let key, let value):
         return statementWithKeyValue(key.qualifiedName, ">", value)
-
       case .greaterThanOrEquals(let key, let value):
         return statementWithKeyValue(key.qualifiedName, ">=", value)
-
       case .lessThan(let key, let value):
         return statementWithKeyValue(key.qualifiedName, "<", value)
-
       case .lessThanOrEquals(let key, let value):
         return statementWithKeyValue(key.qualifiedName, "<=", value)
-
       case .in(let key, let values):
-        var strings = [String]()
-            
-        for _ in values {
-          strings.append(QueryComponents.valuePlaceholder)
-        }
-
+        let strings = [String](repeating: QueryComponents.valuePlaceholder, count: values.count)
         return QueryComponents("\(key) IN (\(strings.joined(separator: ", ")))", values: values)
-
       case .notIn(let key, let values):
         return (!Condition.in(key, values)).queryComponents
-
       case .null(let key):
         return QueryComponents("\(key) IS NULL", values: [])
-
       case .notNull(let key):
         return QueryComponents("\(key) IS NOT NULL", values: [])
-
       case .and(let conditions):
         return QueryComponents(components: conditions.map { $0.queryComponents }, mergedByString: "AND").isolate()
-
       case .or(let conditions):
         return QueryComponents(components: conditions.map { $0.queryComponents }, mergedByString: "OR").isolate()
-
       case .not(let condition):
         var queryComponents = condition.queryComponents.isolate()
         queryComponents.prepend("NOT")
         return queryComponents
-            
       case .like(let key, let value):
         return QueryComponents(strings: [key.qualifiedName, "LIKE", QueryComponents.valuePlaceholder], values: [value])
-      
       case .ilike(let key, let value):
         return QueryComponents(strings: [key.qualifiedName, "ILIKE", QueryComponents.valuePlaceholder], values: [value])
-      
       case .sql(let sql, let values):
         return QueryComponents(sql, values: values).isolate()
     }
