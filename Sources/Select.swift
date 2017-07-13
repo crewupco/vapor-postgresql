@@ -24,6 +24,7 @@ public protocol SelectQuery: FilteredQuery, TableQuery {
   var joins: [Join] { get set }
   var fields: [DeclaredField] { get }
   var distinct: Bool { get set }
+  var count: Bool { get set }
   var offset: Offset? { get set }
   var limit: Limit? { get set }
   var orderBy: [OrderBy] { get set }
@@ -119,13 +120,30 @@ public extension SelectQuery {
   }
 
   public var queryComponents: QueryComponents {
-    var components = QueryComponents(components: [
-      distinct ? "SELECT DISTINCT" : "SELECT",
-      fields.isEmpty ? QueryComponents("\(tableName).*") : fields.queryComponentsForSelectingFields(useQualifiedNames: true, useAliasing: true, isolateQueryComponents: false),
-      "FROM",
-      QueryComponents(tableName)
-    ])
-        
+    var components = QueryComponents(components: ["SELECT"])
+
+    if count {
+      components.append("COUNT(")
+    }
+
+    if distinct {
+      components.append("DISTINCT")
+    }
+
+    if fields.isEmpty {
+      components.append(QueryComponents("\(tableName).*"))
+    }
+    else {
+      components.append(fields.queryComponentsForSelectingFields(useQualifiedNames: true, useAliasing: !count, isolateQueryComponents: false))
+    }
+
+    if count {
+      components.append(")")
+    }
+
+    components.append("FROM")
+    components.append(QueryComponents(tableName))
+
     if !joins.isEmpty {
       components.append(joins.queryComponents)
     }
@@ -150,12 +168,21 @@ public extension SelectQuery {
         
     return components
   }
+
+  public func count(_ connection: Connection) throws -> Int {
+    var new = self
+
+    new.count = true
+
+    return try connection.execute(new).first?.value("count") ?? 0
+  }
 }
 
 public struct Select: SelectQuery {
-  public let fields: [DeclaredField]
+  public var fields: [DeclaredField]
   public let tableName: String
   public var distinct: Bool = false
+  public var count: Bool = false
   public var condition: Condition?
   public var joins: [Join] = []
   public var offset: Offset?
@@ -204,13 +231,18 @@ public struct ModelSelect<T: Model>: SelectQuery, ModelQuery {
     return T.tableName
   }
     
-  public let fields: [DeclaredField]
+  public var fields: [DeclaredField]
   public var distinct: Bool = false
+  public var count: Bool = false
   public var condition: Condition?
   public var joins: [Join] = []
   public var offset: Offset?
   public var limit: Limit?
   public var orderBy: [OrderBy] = []
+
+  public init() {
+    self.fields = T.selectFields.map { T.field($0) }
+  }
 
   public func distinct(_ distinct: Bool = true) -> ModelSelect<T> {
     var new = self
@@ -234,7 +266,11 @@ public struct ModelSelect<T: Model>: SelectQuery, ModelQuery {
     return join(model, using: [type], leftKey: leftKey, rightKey: rightKey)
   }
 
-  public init(_ fields: [DeclaredField]? = nil) {
-    self.fields = fields ?? T.selectFields.map { T.field($0) }
+  public func count(_ field: DeclaredField, _ connection: Connection) throws -> Int {
+    var new = self
+
+    new.fields = [field]
+
+    return try new.count(connection)
   }
 }

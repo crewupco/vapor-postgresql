@@ -94,14 +94,10 @@ public extension Model {
     return ModelSelect()
   }
     
-  public static var countQuery: ModelCount<Self> {
-    return ModelCount()
-  }
-
   public static var deleteQuery: ModelDelete<Self> {
     return ModelDelete()
   }
-  
+
   public static func updateQuery(_ values: [Field: SQLDataConvertible?] = [:]) -> ModelUpdate<Self> {
     return ModelUpdate(values)
   }
