@@ -152,6 +152,14 @@ public func == (lhs: DeclaredField, rhs: DeclaredField) -> Condition {
   return .equals(lhs, .property(rhs))
 }
 
+public func != <T: SQLDataConvertible>(lhs: DeclaredField, rhs: T?) -> Condition {
+  return .not(lhs.equals(rhs))
+}
+
+public func != (lhs: DeclaredField, rhs: DeclaredField) -> Condition {
+  return .not(.equals(lhs, .property(rhs)))
+}
+
 public func > <T: SQLDataConvertible>(lhs: DeclaredField, rhs: T?) -> Condition {
   return .greaterThan(lhs, .value(rhs?.sqlData))
 }
