@@ -30,7 +30,7 @@ public protocol SelectQuery: FilteredQuery, TableQuery {
   var orderBy: [OrderBy] { get set }
 }
 
-public extension SelectQuery {
+extension SelectQuery {
   public var pageSize: Int? {
     get {
       return limit?.value

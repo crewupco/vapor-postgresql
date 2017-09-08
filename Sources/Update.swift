@@ -24,9 +24,9 @@ public protocol UpdateQuery: FilteredQuery, TableQuery {
   var valuesByField: [DeclaredField: SQLData?] { get set }
 }
 
-public extension UpdateQuery {
+extension UpdateQuery {
   public var queryComponents: QueryComponents {
-    var components =  QueryComponents(components: [
+    var components = QueryComponents(components: [
       "UPDATE",
       QueryComponents(tableName),
       "SET",

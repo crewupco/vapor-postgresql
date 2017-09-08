@@ -34,7 +34,7 @@ extension DeclaredField: Hashable {
   }
 }
 
-public extension Sequence where Iterator.Element == DeclaredField {
+extension Sequence where Iterator.Element == DeclaredField {
   public func queryComponentsForSelectingFields(useQualifiedNames useQualified: Bool, useAliasing aliasing: Bool, isolateQueryComponents isolate: Bool) -> QueryComponents {
     let string = map { field in
       var str = useQualified ? field.qualifiedName : field.unqualifiedName
@@ -55,7 +55,7 @@ public extension Sequence where Iterator.Element == DeclaredField {
   }
 }
 
-public extension Collection where Iterator.Element == (DeclaredField, SQLData?) {
+extension Collection where Iterator.Element == (DeclaredField, SQLData?) {
   public func queryComponentsForSettingValues(useQualifiedNames useQualified: Bool) -> QueryComponents {
     let string = map { (field, value) in
       var str = useQualified ? field.qualifiedName : field.unqualifiedName
@@ -86,7 +86,7 @@ public func == (lhs: DeclaredField, rhs: DeclaredField) -> Bool {
   return lhs.hashValue == rhs.hashValue
 }
 
-public extension DeclaredField {
+extension DeclaredField {
   public var qualifiedName: String {
     guard let tableName = tableName else {
       return unqualifiedName

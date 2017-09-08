@@ -65,7 +65,7 @@ public protocol Model {
   init(row: Row) throws
 }
 
-public extension Model {
+extension Model {
   public static var declaredPrimaryKeyField: DeclaredField {
     return field(fieldForPrimaryKey)
   }
@@ -233,7 +233,7 @@ public extension Model {
   }
 }
 
-public extension Model {
+extension Model {
   public func willSave() {}
   public func didSave() {}
     

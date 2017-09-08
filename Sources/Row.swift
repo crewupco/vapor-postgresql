@@ -53,8 +53,6 @@ public struct Row: CustomStringConvertible {
     self.dataByfield = dataByfield
   }
 
-  // MARK: - Data
-    
   public func data(_ field: DeclaredField) throws -> Data? {
     /*
      Supplying a fielName can done either
@@ -107,8 +105,6 @@ public struct Row: CustomStringConvertible {
     return data
   }
     
-    // MARK: - SQLDataConvertible
-    
   public func value<T: SQLDataConvertible>(_ field: DeclaredField) throws -> T? {
     guard let data: Data = try data(field) else {
       return nil
@@ -124,8 +120,6 @@ public struct Row: CustomStringConvertible {
         
     return try T(rawSQLData: data)
   }
-    
-  // MARK - String support
     
   public func data(field: String) throws -> Data? {
     return try data(DeclaredField(name: field))

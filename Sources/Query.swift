@@ -22,7 +22,7 @@
 
 public protocol Query: QueryComponentsConvertible {}
 
-public extension Query {
+extension Query {
   public func execute(_ connection: Connection) throws -> Result {
     return try connection.execute(self)
   }
@@ -36,7 +36,7 @@ public protocol ModelQuery: TableQuery {
   associatedtype ModelType: Model
 }
 
-public extension ModelQuery where Self: SelectQuery {
+extension ModelQuery where Self: SelectQuery {
   public func fetch(_ connection: Connection) throws -> [ModelType] {
     return try connection.execute(self).map { try ModelType(row: $0) }
   }
@@ -135,7 +135,7 @@ public enum ModelOrderBy<T: Model> {
   }
 }
 
-public extension Sequence where Self.Iterator.Element == OrderBy {
+extension Sequence where Self.Iterator.Element == OrderBy {
   public var queryComponents: QueryComponents {
     return QueryComponents(components: map { $0.queryComponents })
   }

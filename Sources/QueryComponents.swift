@@ -145,7 +145,7 @@ public protocol QueryComponentsConvertible {
   var queryComponents: QueryComponents { get }
 }
 
-public extension Sequence where Iterator.Element: QueryComponentsConvertible {
+extension Sequence where Iterator.Element: QueryComponentsConvertible {
   public func queryComponents(mergedByString string: String? = nil) -> QueryComponents {
     return QueryComponents(components: self.map { $0.queryComponents }, mergedByString: string)
   }
