@@ -1,7 +1,0 @@
-#! /bin/sh
-
-set -v
-
-cd -P -- "$(dirname -- "$0")/.."
-
-swift package fetch

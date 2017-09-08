@@ -4,4 +4,4 @@ set -v
 
 cd -P -- "$(dirname -- "$0")/.."
 
-swift package generate-xcodeproj -Xcc -I/usr/local/include -Xlinker -L/usr/local/lib -Xswiftc -I/usr/local/include
+swift package generate-xcodeproj
