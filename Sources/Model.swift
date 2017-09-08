@@ -159,7 +159,7 @@ extension Model {
     return try selectQuery.filter(declaredPrimaryKeyField == pk).first(connection)
   }
     
-  mutating func create(_ connection: Connection) throws {
+  public mutating func create(_ connection: Connection) throws {
     guard !isPersisted else {
       throw ModelError(description: "Cannot create an already persisted model.")
     }
