@@ -156,7 +156,7 @@ extension Model {
   }
     
   public static func get(_ pk: Self.PrimaryKey, connection: Connection) throws -> Self? {
-    return try selectQuery.filter(declaredPrimaryKeyField == pk).first(connection)
+    return try selectQuery.filter(declaredPrimaryKeyField == pk).fetchOne(connection)
   }
     
   public mutating func create(_ connection: Connection) throws {

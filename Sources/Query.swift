@@ -37,11 +37,11 @@ public protocol ModelQuery: TableQuery {
 }
 
 extension ModelQuery where Self: SelectQuery {
-  public func fetch(_ connection: Connection) throws -> [ModelType] {
+  public func fetchAll(_ connection: Connection) throws -> [ModelType] {
     return try connection.execute(self).map { try ModelType(row: $0) }
   }
     
-  public func first(_ connection: Connection) throws -> ModelType? {
+  public func fetchOne(_ connection: Connection) throws -> ModelType? {
     var new = self
     new.offset = 0
     new.limit = 1
