@@ -61,7 +61,7 @@ public struct QueryComponents: CustomStringConvertible {
         
     newStrings.append(strings.last!)
         
-    return newStrings.joined(separator: "")
+    return newStrings.joined()
   }
 
   public init() {

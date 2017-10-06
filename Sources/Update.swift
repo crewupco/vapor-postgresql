@@ -30,8 +30,8 @@ extension UpdateQuery {
       "UPDATE",
       QueryComponents(tableName),
       "SET",
-      valuesByField.map { $0 }.queryComponentsForSettingValues(useQualifiedNames: false)
-      ])
+      valuesByField.map({ $0 }).queryComponentsForSettingValues(useQualifiedNames: false)
+    ])
     
     if let condition = condition {
       components.append("WHERE")
@@ -55,12 +55,12 @@ public struct Update: UpdateQuery {
   public var valuesByField: [DeclaredField: SQLData?]
   public var condition: Condition?
     
-  public init(_ tableName: String, set valuesByField: [DeclaredField : SQLData?] = [:]) {
+  public init(_ tableName: String, set valuesByField: [DeclaredField: SQLData?] = [:]) {
     self.tableName = tableName
     self.valuesByField = valuesByField
   }
     
-  public init(_ tableName: String, set valuesByField: [DeclaredField : SQLDataConvertible?] = [:]) {
+  public init(_ tableName: String, set valuesByField: [DeclaredField: SQLDataConvertible?] = [:]) {
     var dict = [DeclaredField: SQLData?]()
         
     for (key, value) in valuesByField {
@@ -70,7 +70,7 @@ public struct Update: UpdateQuery {
     self.init(tableName, set: dict)
   }
     
-  public init(_ tableName: String, set valuesByField: [String : SQLDataConvertible?] = [:]) {
+  public init(_ tableName: String, set valuesByField: [String: SQLDataConvertible?] = [:]) {
     var dict = [DeclaredField: SQLData?]()
         
     for (key, value) in valuesByField {

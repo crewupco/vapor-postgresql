@@ -134,7 +134,7 @@ public struct Row: CustomStringConvertible {
   }
     
   public var description: String {        
-    return dataByfield.map { (key, value) in
+    return dataByfield.map { key, value in
       guard let value = value else {
         return "NULL"
       }

@@ -32,7 +32,7 @@ extension InsertQuery {
         QueryComponents(tableName),
         valuesByField.keys.queryComponentsForSelectingFields(useQualifiedNames: false, useAliasing: false, isolateQueryComponents: true),
         "VALUES",
-        valuesByField.map { $0 }.queryComponentsForValuePlaceHolders(isolated: true)
+        valuesByField.map({ $0 }).queryComponentsForValuePlaceHolders(isolated: true)
       ]
     )
   }
@@ -42,12 +42,12 @@ public struct Insert: InsertQuery {
   public let tableName: String
   public let valuesByField: [DeclaredField: SQLData?]
     
-  public init(_ valuesByField: [DeclaredField : SQLData?], into tableName: String) {
+  public init(_ valuesByField: [DeclaredField: SQLData?], into tableName: String) {
     self.tableName = tableName
     self.valuesByField = valuesByField
   }
     
-  public init(_ valuesByField: [DeclaredField : SQLDataConvertible?], into tableName: String) {
+  public init(_ valuesByField: [DeclaredField: SQLDataConvertible?], into tableName: String) {
     var dict = [DeclaredField: SQLData?]()
         
     for (key, value) in valuesByField {
@@ -57,7 +57,7 @@ public struct Insert: InsertQuery {
     self.init(dict, into: tableName)
   }
     
-  public init(_ valuesByField: [String : SQLDataConvertible?], into tableName: String) {
+  public init(_ valuesByField: [String: SQLDataConvertible?], into tableName: String) {
     var dict = [DeclaredField: SQLData?]()
         
     for (key, value) in valuesByField {

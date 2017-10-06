@@ -57,12 +57,8 @@ extension Sequence where Iterator.Element == DeclaredField {
 
 extension Collection where Iterator.Element == (DeclaredField, SQLData?) {
   public func queryComponentsForSettingValues(useQualifiedNames useQualified: Bool) -> QueryComponents {
-    let string = map { (field, value) in
-      var str = useQualified ? field.qualifiedName : field.unqualifiedName
-            
-      str += " = " + QueryComponents.valuePlaceholder
-            
-      return str
+    let string = map { field, value in
+      return (useQualified ? field.qualifiedName : field.unqualifiedName) + " = " + QueryComponents.valuePlaceholder
     }.joined(separator: ", ")
         
     return QueryComponents(string, values: map { $0.1 })
