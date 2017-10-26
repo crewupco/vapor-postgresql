@@ -51,8 +51,8 @@ public protocol Model {
   func willUpdate()
   func didUpdate()
     
-  func willCreate()
-  func didCreate()
+  func willInsert()
+  func didInsert()
     
   func willDelete()
   func didDelete()
@@ -159,7 +159,7 @@ extension Model {
     return try selectQuery.filter(declaredPrimaryKeyField == pk).fetchOne(connection)
   }
     
-  public mutating func create(_ connection: Connection) throws {
+  public mutating func insert(_ connection: Connection) throws {
     guard !isPersisted else {
       throw ModelError(description: "Cannot create an already persisted model.")
     }
@@ -173,9 +173,9 @@ extension Model {
     }
         
     willSave()
-    willCreate()
+    willInsert()
     self = newSelf
-    didCreate()
+    didInsert()
     didSave()
   }
     
@@ -225,7 +225,7 @@ extension Model {
       try update(connection)
     }
     else {
-      try create(connection)
+      try insert(connection)
       guard isPersisted else {
         fatalError("Primary key not set after insert. This is a serious error in an SQL adapter. Please consult a developer.")
       }
@@ -240,8 +240,8 @@ extension Model {
   public func willUpdate() {}
   public func didUpdate() {}
     
-  public func willCreate() {}
-  public func didCreate() {}
+  public func willInsert() {}
+  public func didInsert() {}
     
   public func willDelete() {}
   public func didDelete() {}
