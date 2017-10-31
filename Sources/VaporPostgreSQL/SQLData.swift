@@ -123,3 +123,18 @@ extension Data: SQLDataConvertible {
     self = data
   }
 }
+
+extension RawRepresentable where RawValue == String {
+  public var sqlData: SQLData {
+    return .text(rawValue)
+  }
+  
+  public init(rawSQLData data: Data) throws {
+    guard let string = String(data: data, encoding: .utf8),
+          let value = Self(rawValue: string) else {
+      throw SQLDataConversionError(description: "Failed to convert data to \(Self.self)")
+    }
+    
+    self = value
+  }
+}
