@@ -149,7 +149,8 @@ extension Result: Collection {
       let fieldIndex = Int32(fieldIndex)
       
       if PQgetisnull(resultPointer, index, fieldIndex) == 1 {
-        result[field] = nil
+        // Set the key to nil to distinguish between a null field and a missing field.
+        result.updateValue(nil, forKey: field)
       }
       else {
         result[field] = Data(bytes: PQgetvalue(resultPointer, index, fieldIndex),

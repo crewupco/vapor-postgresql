@@ -70,21 +70,15 @@ public struct Row: CustomStringConvertible {
       field.qualifiedName
     ]
         
-    var data: Data??
-        
     for fieldNameCandidate in fieldCandidates {
-      data = dataByfield[fieldNameCandidate]
-            
-      if data != nil {
-        break
+      // Return the first value we find by key, even if it's nil.
+      
+      if dataByfield.index(forKey: fieldNameCandidate) != nil {
+        return dataByfield[fieldNameCandidate]!
       }
     }
-        
-    guard let result = data else {
-      throw RowError.expectedField(field)
-    }
     
-    return result
+    throw RowError.expectedField(field)
   }
     
   public func data(_ field: DeclaredField) throws -> Data {
