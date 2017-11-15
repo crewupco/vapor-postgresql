@@ -47,7 +47,7 @@ extension Sequence where Iterator.Element == DeclaredField {
     }.joined(separator: ", ")
         
     if isolate {
-      return QueryComponents(string).isolate()
+      return QueryComponents(string).isolated()
     }
     else {
       return QueryComponents(string)
@@ -74,7 +74,7 @@ extension Collection where Iterator.Element == (DeclaredField, SQLData?) {
     let string = strings.joined(separator: ", ")
     let components = QueryComponents(string, values: map { $0.1 })
         
-    return isolate ? components.isolate() : components
+    return isolate ? components.isolated() : components
   }
 }
 

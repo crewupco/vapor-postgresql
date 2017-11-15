@@ -116,8 +116,7 @@ public class Connection {
   @discardableResult
   public func executeInsertQuery<T: SQLDataConvertible>(query: InsertQuery, returningPrimaryKeyForField primaryKey: DeclaredField) throws -> T {
 
-    var components = query.queryComponents
-    components.append(QueryComponents(strings: ["RETURNING", primaryKey.qualifiedName, "AS", "returned__pk"]))
+    let components = query.queryComponents.appending(QueryComponents(strings: ["RETURNING", primaryKey.qualifiedName, "AS", "returned__pk"]))
 
     DispatchQueue.global(qos: .background).async() {
       NotificationCenter.default.post(name: Connection.willExecuteSQL, object: components.string, userInfo: nil)

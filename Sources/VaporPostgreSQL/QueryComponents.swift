@@ -93,7 +93,7 @@ public struct QueryComponents: CustomStringConvertible {
     self.init(strings: [string], values: values)
   }
 
-  public func isolate() -> QueryComponents {
+  public func isolated() -> QueryComponents {
     return QueryComponents("(" + stringComponents.joined(separator: " ") + ")", values: values)
   }
 
@@ -101,10 +101,20 @@ public struct QueryComponents: CustomStringConvertible {
     stringComponents += component.stringComponents
     values += component.values
   }
-    
+  
   public mutating func prepend(_ component: QueryComponents) {
     stringComponents = component.stringComponents + stringComponents
     values = component.values + values
+  }
+  
+  public func appending(_ component: QueryComponents) -> QueryComponents {
+    return QueryComponents(strings: stringComponents + component.stringComponents,
+                           values: values + component.values)
+  }
+    
+  public func prepending(_ component: QueryComponents) -> QueryComponents {
+    return QueryComponents(strings: component.stringComponents + stringComponents,
+                           values: component.values + values)
   }
     
   public var description: String {

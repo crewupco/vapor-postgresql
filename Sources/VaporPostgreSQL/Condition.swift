@@ -73,19 +73,17 @@ public indirect enum Condition: QueryComponentsConvertible {
       case let .notNull(key):
         return QueryComponents("\(key) IS NOT NULL", values: [])
       case let .and(conditions):
-        return QueryComponents(components: conditions.map { $0.queryComponents }, mergedByString: "AND").isolate()
+        return QueryComponents(components: conditions.map { $0.queryComponents }, mergedByString: "AND").isolated()
       case let .or(conditions):
-        return QueryComponents(components: conditions.map { $0.queryComponents }, mergedByString: "OR").isolate()
+        return QueryComponents(components: conditions.map { $0.queryComponents }, mergedByString: "OR").isolated()
       case let .not(condition):
-        var queryComponents = condition.queryComponents.isolate()
-        queryComponents.prepend("NOT")
-        return queryComponents
+        return condition.queryComponents.isolated().prepending("NOT")
       case let .like(key, value):
         return QueryComponents(strings: [key.qualifiedName, "LIKE", QueryComponents.valuePlaceholder], values: [value])
       case let .ilike(key, value):
         return QueryComponents(strings: [key.qualifiedName, "ILIKE", QueryComponents.valuePlaceholder], values: [value])
       case let .sql(sql, values):
-        return QueryComponents(sql, values: values.map({ $0?.sqlData })).isolate()
+        return QueryComponents(sql, values: values.map({ $0?.sqlData })).isolated()
     }
   }
 }
