@@ -65,9 +65,10 @@ public indirect enum Condition: QueryComponentsConvertible {
         return statementWithKeyValue(key.qualifiedName, "<=", value)
       case let .in(key, values):
         let strings = [String](repeating: QueryComponents.valuePlaceholder, count: values.count)
-        return QueryComponents("\(key) IN (\(strings.joined(separator: ", ")))", values: values)
+        return values.isEmpty ? QueryComponents("FALSE", values: [])
+                              : QueryComponents("\(key) IN (\(strings.joined(separator: ", ")))", values: values)
       case let .notIn(key, values):
-        return (!Condition.in(key, values)).queryComponents
+        return values.isEmpty ? QueryComponents("TRUE", values: []) : (!Condition.in(key, values)).queryComponents
       case let .null(key):
         return QueryComponents("\(key) IS NULL", values: [])
       case let .notNull(key):
