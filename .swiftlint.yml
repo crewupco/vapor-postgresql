@@ -38,9 +38,11 @@ disabled_rules:
   - function_parameter_count
   - identifier_name
   - line_length
+  - large_tuple
   - notification_center_detachment
   - operator_whitespace
   - private_over_fileprivate
+  - redundant_discardable_let
   - redundant_string_enum_value
   - switch_case_alignment
   - todo
