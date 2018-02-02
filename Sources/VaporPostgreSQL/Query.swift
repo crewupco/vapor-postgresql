@@ -23,8 +23,8 @@
 public protocol Query: QueryComponentsConvertible {}
 
 extension Query {
-  public func execute(_ connection: Connection) throws -> Result {
-    return try connection.execute(self)
+  public func execute(_ db: DatabaseConnection) throws -> Result {
+    return try db.execute(self)
   }
 }
 
@@ -37,15 +37,15 @@ public protocol ModelQuery: TableQuery {
 }
 
 extension ModelQuery where Self: SelectQuery {
-  public func fetchAll(_ connection: Connection) throws -> [ModelType] {
-    return try connection.execute(self).map { try ModelType(row: $0) }
+  public func fetchAll(_ db: DatabaseConnection) throws -> [ModelType] {
+    return try db.execute(self).map { try ModelType(row: $0) }
   }
     
-  public func fetchOne(_ connection: Connection) throws -> ModelType? {
+  public func fetchOne(_ db: DatabaseConnection) throws -> ModelType? {
     var new = self
     new.offset = 0
     new.limit = 1
-    return try connection.execute(new).map { try ModelType(row: $0) }.first
+    return try db.execute(new).map { try ModelType(row: $0) }.first
   }
     
   public func orderBy(_ values: [ModelOrderBy<ModelType>]) -> Self {

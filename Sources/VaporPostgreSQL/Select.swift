@@ -169,12 +169,12 @@ extension SelectQuery {
     return components
   }
 
-  public func count(_ connection: Connection) throws -> Int {
+  public func count(_ db: DatabaseConnection) throws -> Int {
     var new = self
 
     new.count = true
 
-    return try connection.execute(new).first?.value("count") ?? 0
+    return try db.execute(new).first?.value("count") ?? 0
   }
 }
 
@@ -266,11 +266,11 @@ public struct ModelSelect<T: Model>: SelectQuery, ModelQuery {
     return join(model, using: [type], leftKey: leftKey, rightKey: rightKey)
   }
 
-  public func count(_ field: DeclaredField, _ connection: Connection) throws -> Int {
+  public func count(_ field: DeclaredField, _ db: DatabaseConnection) throws -> Int {
     var new = self
 
     new.fields = [field]
 
-    return try new.count(connection)
+    return try new.count(db)
   }
 }

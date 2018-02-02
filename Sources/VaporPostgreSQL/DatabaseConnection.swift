@@ -27,7 +27,27 @@ public struct ConnectionError: Error, CustomStringConvertible {
   public let description: String
 }
 
-public class Connection {
+public class DatabaseConnection {
+  public struct Configuration {
+    public let host: String
+    public let port: Int
+    public let database: String
+    public let username: String?
+    public let password: String?
+    public let options: String?
+    public let tty: String?
+    
+    public init(host: String, port: Int = 5432, database: String, username: String? = nil, password: String? = nil, options: String? = nil, tty: String? = nil) {
+      self.host = host
+      self.port = port
+      self.database = database
+      self.username = username
+      self.password = password
+      self.options = options
+      self.tty = tty
+    }
+  }
+
   public static let willExecuteSQL = Notification.Name("PostgreSQL.Connection.willExecuteSQL") // object = "<sql>"
   
   public enum InternalStatus {
@@ -68,10 +88,10 @@ public class Connection {
     }
   }
 
-  public let connectionInfo: ConnectionInfo
+  public let configuration: Configuration
 
   public var mostRecentError: ConnectionError? {
-    guard let errorString = String(validatingUTF8: PQerrorMessage(connection)), !errorString.isEmpty else {
+    guard let errorString = String(validatingUTF8: PQerrorMessage(self.connection)), !errorString.isEmpty else {
       return nil
     }
     
@@ -84,8 +104,8 @@ public class Connection {
   
   fileprivate var connection: OpaquePointer?
 
-  public required init(info: ConnectionInfo) {
-    self.connectionInfo = info
+  public required init(configuration: Configuration) {
+    self.configuration = configuration
   }
     
   deinit {
@@ -93,14 +113,14 @@ public class Connection {
   }
     
   public func open() throws {
-    connection = PQsetdbLogin(
-      connectionInfo.host,
-      String(connectionInfo.port),
-      connectionInfo.options ?? "",
-      connectionInfo.tty ?? "",
-      connectionInfo.database,
-      connectionInfo.username ?? "",
-      connectionInfo.password ?? ""
+    self.connection = PQsetdbLogin(
+      self.configuration.host,
+      String(self.configuration.port),
+      self.configuration.options ?? "",
+      self.configuration.tty ?? "",
+      self.configuration.database,
+      self.configuration.username ?? "",
+      self.configuration.password ?? ""
     )
         
     if let error = mostRecentError {
@@ -109,8 +129,8 @@ public class Connection {
   }
     
   public func close() {
-    PQfinish(connection)
-    connection = nil
+    PQfinish(self.connection)
+    self.connection = nil
   }
     
   @discardableResult
@@ -119,7 +139,7 @@ public class Connection {
     let components = query.queryComponents.appending(QueryComponents(strings: ["RETURNING", primaryKey.qualifiedName, "AS", "returned__pk"]))
 
     DispatchQueue.global(qos: .background).async() {
-      NotificationCenter.default.post(name: Connection.willExecuteSQL, object: components.string, userInfo: nil)
+      NotificationCenter.default.post(name: DatabaseConnection.willExecuteSQL, object: components.string, userInfo: nil)
     }
     
     let result = try execute(components)
@@ -135,12 +155,12 @@ public class Connection {
   public func execute(_ components: QueryComponents) throws -> Result {
 #if Xcode
     DispatchQueue.global(qos: .background).async() {
-      NotificationCenter.default.post(name: Connection.willExecuteSQL, object: components.string, userInfo: nil)
+      NotificationCenter.default.post(name: DatabaseConnection.willExecuteSQL, object: components.string, userInfo: nil)
     }
 #endif
 
     guard !components.values.isEmpty else {
-      guard let resultPointer = PQexec(connection, components.string) else {
+      guard let resultPointer = PQexec(self.connection, components.string) else {
         throw mostRecentError ?? ConnectionError(description: "Empty result")
       }
           

@@ -155,20 +155,20 @@ extension Model {
     self.changedFields = changedFields
   }
     
-  public static func get(_ pk: Self.PrimaryKey, connection: Connection) throws -> Self? {
-    return try selectQuery.filter(declaredPrimaryKeyField == pk).fetchOne(connection)
+  public static func get(_ pk: Self.PrimaryKey, db: DatabaseConnection) throws -> Self? {
+    return try selectQuery.filter(declaredPrimaryKeyField == pk).fetchOne(db)
   }
     
-  public mutating func insert(_ connection: Connection) throws {
+  public mutating func insert(_ db: DatabaseConnection) throws {
     guard !isPersisted else {
       throw ModelError(description: "Cannot create an already persisted model.")
     }
         
     try validate()
                 
-    let pk: PrimaryKey = try connection.executeInsertQuery(query: type(of: self).insertQuery(values: persistedValuesByField), returningPrimaryKeyForField: type(of: self).declaredPrimaryKeyField)
+    let pk: PrimaryKey = try db.executeInsertQuery(query: type(of: self).insertQuery(values: persistedValuesByField), returningPrimaryKeyForField: type(of: self).declaredPrimaryKeyField)
         
-    guard let newSelf = try type(of: self).get(pk, connection: connection) else {
+    guard let newSelf = try type(of: self).get(pk, db: db) else {
       throw ModelError(description: "Failed to find model of supposedly inserted id \(pk)")
     }
         
@@ -179,8 +179,8 @@ extension Model {
     didSave()
   }
     
-  public mutating func refresh(_ connection: Connection) throws {
-    guard let pk = primaryKey, let newSelf = try Self.get(pk, connection: connection) else {
+  public mutating func refresh(_ db: DatabaseConnection) throws {
+    guard let pk = primaryKey, let newSelf = try Self.get(pk, db: db) else {
       throw ModelError(description: "Cannot refresh a non-persisted model. Please use insert() or save() first.")
     }
         
@@ -189,7 +189,7 @@ extension Model {
     didRefresh()
   }
     
-  public mutating func update(_ connection: Connection) throws {
+  public mutating func update(_ db: DatabaseConnection) throws {
     guard let pk = primaryKey else {
       throw ModelError(description: "Cannot update a model that isn't persisted. Please use insert() first or save()")
     }
@@ -204,28 +204,28 @@ extension Model {
         
     willSave()
     willUpdate()
-    _ = try Self.updateQuery(values).filter(Self.declaredPrimaryKeyField == pk).execute(connection)
+    _ = try Self.updateQuery(values).filter(Self.declaredPrimaryKeyField == pk).execute(db)
     didUpdate()
-    try self.refresh(connection)
+    try self.refresh(db)
     didSave()
   }
     
-  public mutating func delete(_ connection: Connection) throws {
+  public mutating func delete(_ db: DatabaseConnection) throws {
     guard let pk = self.primaryKey else {
       throw ModelError(description: "Cannot delete a model that isn't persisted.")
     }
         
     willDelete()
-    _ = try Self.deleteQuery.filter(Self.declaredPrimaryKeyField == pk).execute(connection)
+    _ = try Self.deleteQuery.filter(Self.declaredPrimaryKeyField == pk).execute(db)
     didDelete()
   }
 
-  public mutating func save(_ connection: Connection) throws {
+  public mutating func save(_ db: DatabaseConnection) throws {
     if isPersisted {
-      try update(connection)
+      try update(db)
     }
     else {
-      try insert(connection)
+      try insert(db)
       guard isPersisted else {
         fatalError("Primary key not set after insert. This is a serious error in an SQL adapter. Please consult a developer.")
       }
